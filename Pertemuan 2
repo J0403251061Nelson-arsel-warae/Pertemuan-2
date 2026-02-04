@@ -1,0 +1,206 @@
+# ================================================
+# Praktikum 2 : Konsep ADT dan File Handling (Studi Kasus)
+# ================================================
+
+# Deklarasi nama file secara global agar dapat diakses oleh semua fungsi
+nama_file = 'data_mahasiswa.txt'
+
+# ===============================================
+# Latihan Dasar 1 : Membuat Fungsi Load Data
+# ===============================================
+def load_data_mahasiswa(nama_file):
+    data_mahasiswa = {}
+    try:
+        with open(nama_file, 'r', encoding='utf-8') as file:
+            for baris in file:
+                baris = baris.strip()
+                # Cek jika baris tidak kosong untuk menghindari error
+                if baris:
+                    nim, nama, nilai = baris.split(',')
+                    data_mahasiswa[nim.upper()] = {  # NIM disimpan dalam huruf kapital untuk konsistensi
+                        'nama': nama.strip(),
+                        'nilai': int(nilai.strip())
+                    }
+        print("Data berhasil dimuat dari file.")
+    except FileNotFoundError:
+        print(f"File {nama_file} tidak ditemukan. Membuat struktur data baru.")
+    return data_mahasiswa
+
+# ===============================================
+# Latihan Dasar 2 : Membuat Fungsi Menampilkan Data
+# ===============================================
+def tampil_data_mahasiswa(data_mahasiswa):
+    if not data_mahasiswa:
+        print("\n=== Data Mahasiswa ===")
+        print("Belum ada data mahasiswa yang tersimpan.")
+        return
+    
+    print("\n" + "="*40)
+    print("=== Data Mahasiswa ===")
+    print("="*40)
+    print(f"{'NIM':<10} | {'Nama':<20} | {'Nilai':>5}")
+    print("-"*40)
+    for nim in sorted(data_mahasiswa.keys()):
+        detail = data_mahasiswa[nim]
+        print(f"{nim:<10} | {detail['nama']:<20} | {detail['nilai']:>5}")
+    print("="*40)
+
+# ===============================================
+# Latihan Dasar 3 : Membuat Fungsi Mencari Data
+# ===============================================
+def cari_data_mahasiswa(data_mahasiswa):
+    if not data_mahasiswa:
+        print("\nBelum ada data mahasiswa untuk dicari.")
+        return
+    
+    nim_input = input("Masukkan NIM yang ingin dicari: ").upper().strip()
+    print("\n" + "-"*30)
+    if nim_input in data_mahasiswa:
+        detail = data_mahasiswa[nim_input]
+        print("Data Ditemukan:")
+        print(f"NIM  : {nim_input}")
+        print(f"Nama : {detail['nama']}")
+        print(f"Nilai: {detail['nilai']}")
+    else:
+        print(f"Data dengan NIM {nim_input} Tidak Ditemukan.")
+    print("-"*30)
+
+# ===============================================
+# Latihan Dasar 4 : Membuat Fungsi Update Data
+# ===============================================
+def update_data_mahasiswa(data_mahasiswa):
+    if not data_mahasiswa:
+        print("\nBelum ada data mahasiswa untuk diupdate.")
+        return
+    
+    nim_input = input("Masukkan NIM yang ingin diupdate: ").upper().strip()
+    print("\n" + "-"*30)
+    if nim_input not in data_mahasiswa:
+        print(f"Data dengan NIM {nim_input} Tidak Ditemukan.")
+        print("-"*30)
+        return
+    
+    try:
+        nilai_baru = int(input("Masukkan Nilai Baru (0-100): ").strip())
+    except ValueError:
+        print("Nilai harus berupa angka bulat antara 0-100.")
+        print("-"*30)
+        return
+    
+    if nilai_baru < 0 or nilai_baru > 100:
+        print("Nilai harus berada dalam rentang 0 hingga 100.")
+        print("-"*30)
+        return
+    
+    nilai_lama = data_mahasiswa[nim_input]['nilai']
+    data_mahasiswa[nim_input]['nilai'] = nilai_baru
+    print(f"Data Berhasil Diupdate!")
+    print(f"Nilai lama: {nilai_lama} | Nilai baru: {nilai_baru}")
+    print("-"*30)
+
+# ================================================
+# Latihan Dasar 5 : Membuat Fungsi Simpan Data
+# ================================================
+def simpan_data_mahasiswa(nama_file, data_mahasiswa):
+    if not data_mahasiswa:
+        print("\nTidak ada data untuk disimpan.")
+        return
+    
+    with open(nama_file, 'w', encoding='utf-8') as file:
+        for nim in sorted(data_mahasiswa.keys()):
+            detail = data_mahasiswa[nim]
+            baris = f"{nim},{detail['nama'].strip()},{detail['nilai']}\n"
+            file.write(baris)
+    print("\n" + "="*30)
+    print("Data Berhasil Disimpan ke File!")
+    print("="*30)
+
+# ================================================
+# Latihan Dasar 6 : Menambahkan Data Mahasiswa
+# ================================================
+def tambah_data_mahasiswa(data_mahasiswa):
+    nim_baru = input("Masukkan NIM Baru: ").upper().strip()
+    print("\n" + "-"*30)
+    if nim_baru in data_mahasiswa:
+        print(f"NIM {nim_baru} sudah ada dalam data.")
+        print("-"*30)
+        return
+    
+    nama_baru = input("Masukkan Nama Mahasiswa: ").strip()
+    if not nama_baru:
+        print("Nama tidak boleh kosong.")
+        print("-"*30)
+        return
+    
+    try:
+        nilai_baru = int(input("Masukkan Nilai Mahasiswa (0-100): ").strip())
+    except ValueError:
+        print("Nilai harus berupa angka bulat antara 0-100.")
+        print("-"*30)
+        return
+    
+    if nilai_baru < 0 or nilai_baru > 100:
+        print("Nilai harus berada dalam rentang 0 hingga 100.")
+        print("-"*30)
+        return
+    
+    data_mahasiswa[nim_baru] = {
+        'nama': nama_baru,
+        'nilai': nilai_baru
+    }
+    print("Data Mahasiswa Berhasil Ditambahkan!")
+    print(f"NIM  : {nim_baru}")
+    print(f"Nama : {nama_baru}")
+    print(f"Nilai: {nilai_baru}")
+    print("-"*30)
+
+# ================================================
+# Latihan Dasar 7 : Membuat Fungsi Menu Utama
+# ================================================
+def menu_utama():
+    print("="*45)
+    print("=== Program Manajemen Data Mahasiswa ===")
+    print("="*45)
+    # Muat data saat awal program berjalan
+    buka_data = load_data_mahasiswa(nama_file)
+    
+    while True:
+        print("\n" + "="*30)
+        print("          MENU UTAMA          ")
+        print("="*30)
+        print("1. Tampilkan Seluruh Data Mahasiswa")
+        print("2. Cari Data Mahasiswa Berdasarkan NIM")
+        print("3. Update Nilai Mahasiswa")
+        print("4. Simpan Data ke File")
+        print("5. Tambah Data Mahasiswa Baru")
+        print("6. Keluar dari Program")
+        print("="*30)
+        
+        pilihan = input("Masukkan pilihan Anda (1-6): ").strip()
+        print("\n" + "-"*45)
+        
+        if pilihan == '1':
+            tampil_data_mahasiswa(buka_data)
+        elif pilihan == '2':
+            cari_data_mahasiswa(buka_data)
+        elif pilihan == '3':
+            update_data_mahasiswa(buka_data)
+        elif pilihan == '4':
+            simpan_data_mahasiswa(nama_file, buka_data)
+        elif pilihan == '5':
+            tambah_data_mahasiswa(buka_data)
+        elif pilihan == '6':
+            # Beri pilihan menyimpan data sebelum keluar
+            konfirmasi = input("Apakah Anda ingin menyimpan data sebelum keluar? (y/n): ").lower().strip()
+            if konfirmasi == 'y':
+                simpan_data_mahasiswa(nama_file, buka_data)
+            print("\nTerima kasih telah menggunakan program ini!")
+            print("Program selesai.")
+            break
+        else:
+            print("Pilihan tidak valid! Silakan masukkan angka antara 1 hingga 6.")
+        print("-"*45)
+
+# Jalankan menu utama saat program dijalankan
+if __name__ == "__main__":
+    menu_utama()
